@@ -10,6 +10,7 @@ import Groups from './pages/Groups';
 import GroupDetail from './pages/GroupDetail';
 import Settlements from './pages/Settlements';
 import AIAssistant from './pages/AIAssistant';
+import Profile from './pages/Profile';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -48,7 +49,6 @@ export default function App() {
           @keyframes spin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
           @keyframes fadeUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
           @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.5} }
-          @keyframes ripple { 0%{transform:scale(1);opacity:0.8}100%{transform:scale(2.5);opacity:0} }
         `}</style>
         <Routes>
           <Route path="/login"       element={<PublicRoute><Login /></PublicRoute>} />
@@ -58,6 +58,7 @@ export default function App() {
           <Route path="/groups/:id"  element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
           <Route path="/settlements" element={<ProtectedRoute><Settlements /></ProtectedRoute>} />
           <Route path="/ai"          element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
+          <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/"            element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>

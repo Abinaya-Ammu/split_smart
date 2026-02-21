@@ -24,6 +24,7 @@ public class SettlementService {
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
     private final ExpenseSplitRepository splitRepository;
+    private final NotificationService notificationService;
 
     /**
      * ✅ CORE ALGORITHM: Minimize number of transactions using Heap-based approach.
@@ -114,7 +115,19 @@ public class SettlementService {
             }
         }
 
-        settlementRepository.saveAll(newSettlements);
+        List<Settlement> saved = settlementRepository.saveAll(newSettlements);
+
+        // 🔔 Notify each debtor about their payment due
+        for (Settlement s : saved) {
+            notificationService.sendPaymentDueNotif(
+                s.getFromUser().getId(),
+                s.getToUser().getName(),
+                s.getAmount(),
+                group.getName(),
+                s.getId(),
+                s.getToUser().getUpiId()
+            );
+        }
     }
 
     @Transactional
@@ -130,7 +143,15 @@ public class SettlementService {
         settlement.setTransactionId(transactionId);
         settlementRepository.save(settlement);
 
-        // Update reward points for early payer
+        // 🔔 Notify the creditor that payment was received
+        notificationService.sendPaymentReceivedNotif(
+            settlement.getToUser().getId(),
+            settlement.getFromUser().getName(),
+            settlement.getAmount(),
+            settlement.getGroup().getName()
+        );
+
+        // Update reward points
         User fromUser = settlement.getFromUser();
         fromUser.setRewardPoints(fromUser.getRewardPoints() + 10);
         userRepository.save(fromUser);

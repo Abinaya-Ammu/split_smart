@@ -198,7 +198,7 @@ export default function Dashboard() {
 }
 
 const S = {
-  page:      { padding: 32, maxWidth: 1100, animation: 'fadeUp 0.4s ease' },
+  page:      { padding: 32, maxWidth: 1200, animation: 'fadeUp 0.4s ease' },
   header:    { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, flexWrap: 'wrap', gap: 12 },
   greeting:  { fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 28, color: 'var(--text-primary)', marginBottom: 4 },
   nameGrad:  { background: 'linear-gradient(135deg, var(--accent-bright), var(--success))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },

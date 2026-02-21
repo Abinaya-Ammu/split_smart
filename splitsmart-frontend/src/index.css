@@ -151,19 +151,8 @@ body::before {
 .animate-fadeIn { animation: fadeIn 0.3s ease forwards; }
 
 /* Layout */
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: 260px;
-}
-
-.main-content {
-  flex: 1;
-  min-height: 100vh;
-}
+.app-layout { display: flex; min-height: 100vh; }
+.main-content { flex: 1; margin-left: 260px; min-height: 100vh; } remove some space between them
 
 /* Divider */
 .divider {

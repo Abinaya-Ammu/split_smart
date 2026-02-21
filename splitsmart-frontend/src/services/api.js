@@ -16,25 +16,16 @@ API.interceptors.response.use(
   res => res,
   err => {
     if (err.response?.status === 401 && !err.config?.url?.includes('/auth/')) {
-      localStorage.clear();
-      window.location.href = '/login';
+      localStorage.clear(); window.location.href = '/login';
     }
     return Promise.reject(err);
   }
 );
 
-// Backend wraps everything: { success, message, data: <actual payload> }
 const unwrap = (res) => {
-  const body = res.data;
-  if (body && typeof body === 'object' && 'data' in body) return body.data;
-  return body;
+  const b = res.data;
+  return (b && typeof b === 'object' && 'data' in b) ? b.data : b;
 };
-
-const errMsg = (err) =>
-  err?.response?.data?.message ||
-  err?.response?.data?.data ||
-  err?.message ||
-  'Something went wrong';
 
 export const authAPI = {
   register: async (d) => unwrap(await API.post('/auth/register', d)),
@@ -42,12 +33,12 @@ export const authAPI = {
 };
 
 export const groupAPI = {
-  getAll:      async ()         => { try { return unwrap(await API.get('/groups')) || []; } catch { return []; } },
+  getAll:      async ()         => { try { return unwrap(await API.get('/groups')) || []; }                                              catch { return []; } },
   getById:     async (id)       => unwrap(await API.get(`/groups/${id}`)),
   create:      async (d)        => unwrap(await API.post('/groups', d)),
   addMember:   async (gId, uId) => unwrap(await API.post(`/groups/${gId}/members?userId=${uId}`)),
-  getMembers:  async (id)       => { try { return unwrap(await API.get(`/groups/${id}/members`)) || []; } catch { return []; } },
-  searchUsers: async (q)        => { try { return unwrap(await API.get(`/groups/search-users?q=${encodeURIComponent(q)}`)) || []; } catch { return []; } },
+  getMembers:  async (id)       => { try { return unwrap(await API.get(`/groups/${id}/members`)) || []; }                               catch { return []; } },
+  searchUsers: async (q)        => { try { return unwrap(await API.get(`/groups/search-users?q=${encodeURIComponent(q)}`)) || []; }    catch { return []; } },
   joinByCode:  async (code)     => unwrap(await API.post(`/groups/join/${code}`)),
 };
 
@@ -58,20 +49,39 @@ export const expenseAPI = {
       return Array.isArray(d) ? d : (d?.content || []);
     } catch { return []; }
   },
-  create:  async (d)  => unwrap(await API.post('/expenses', d)),
-  getById: async (id) => unwrap(await API.get(`/expenses/${id}`)),
+  create: async (d) => unwrap(await API.post('/expenses', d)),
 };
 
 export const settlementAPI = {
-  getPending:   async ()    => { try { return unwrap(await API.get('/settlements/pending')) || []; } catch { return []; } },
+  getPending:   async ()    => { try { return unwrap(await API.get('/settlements/pending')) || []; }       catch { return []; } },
   getByGroup:   async (gId) => { try { return unwrap(await API.get(`/settlements/group/${gId}`)) || []; } catch { return []; } },
   settle:       async (id, paymentMethod, txId) =>
     unwrap(await API.post(`/settlements/${id}/settle`, { paymentMethod: paymentMethod || null, transactionId: txId || null })),
   sendReminder: async (id)  => unwrap(await API.post(`/settlements/${id}/remind`)),
 };
 
+export const notificationAPI = {
+  getAll:         async ()    => { try { return unwrap(await API.get('/notifications')) || []; }               catch { return []; } },
+  getUnreadCount: async ()    => { try { return unwrap(await API.get('/notifications/unread-count')) || 0; }  catch { return 0;  } },
+  markAllRead:    async ()    => unwrap(await API.post('/notifications/mark-all-read')),
+  markRead:       async (id)  => unwrap(await API.post(`/notifications/${id}/read`)),
+};
+
+export const userAPI = {
+  getMe:         async ()       => { try { return unwrap(await API.get('/profile')); } catch { return null; } },
+  updateProfile: async (d)      => unwrap(await API.patch('/profile', d)),
+  updateUpi:     async (upiId)  => unwrap(await API.patch('/profile/upi', { upiId })),
+};
+
+export const aiAPI = {
+  getInsights:    async ()    => { try { return unwrap(await API.get('/ai/insights')) || []; }        catch { return []; }   },
+  triggerAnalyze: async ()    => { try { return unwrap(await API.post('/ai/analyze')); }              catch { return null; } },
+  markRead:       async (id)  => { try { return unwrap(await API.patch(`/ai/insights/${id}/read`)); } catch {}              },
+};
+
 export const dashboardAPI = {
   get: async () => { try { return unwrap(await API.get('/dashboard')) || {}; } catch { return {}; } },
 };
 
-export { errMsg };
+export const errMsg = (err) =>
+  err?.response?.data?.message || err?.message || 'Something went wrong';

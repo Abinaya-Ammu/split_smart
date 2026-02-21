@@ -25,6 +25,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public GroupResponse createGroup(String name, String description, String icon,
@@ -45,13 +46,16 @@ public class GroupService {
 
         group = groupRepository.save(group);
 
-        // Auto-add creator as admin member
+        // Add creator as admin member
         groupMemberRepository.save(GroupMember.builder()
                 .group(group)
                 .user(creator)
                 .role(GroupMember.MemberRole.ADMIN)
                 .isActive(true)
                 .build());
+
+        // 🔔 Notify creator that group was created
+        notificationService.sendGroupCreatedNotif(creatorId, name, group.getId());
 
         return mapToResponse(group, 1);
     }
@@ -70,6 +74,8 @@ public class GroupService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User requester = userRepository.findById(requesterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Requester not found"));
 
         groupMemberRepository.save(GroupMember.builder()
                 .group(group)
@@ -77,6 +83,9 @@ public class GroupService {
                 .role(GroupMember.MemberRole.MEMBER)
                 .isActive(true)
                 .build());
+
+        // 🔔 Notify the new member they were added
+        notificationService.sendGroupInviteNotif(userId, requester.getName(), group.getName(), groupId);
     }
 
     @Transactional
@@ -99,6 +108,13 @@ public class GroupService {
                 .build());
 
         int count = groupMemberRepository.findByGroupIdAndIsActiveTrue(group.getId()).size();
+
+        // 🔔 Notify group creator that someone joined
+        if (group.getCreatedBy() != null) {
+            notificationService.sendMemberJoinedNotif(
+                group.getCreatedBy().getId(), user.getName(), group.getName(), group.getId());
+        }
+
         return mapToResponse(group, count);
     }
 

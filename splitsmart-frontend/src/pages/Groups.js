@@ -134,6 +134,9 @@ export default function Groups() {
               </div>
               <h3 style={S.cardName}>{g.name}</h3>
               <p style={S.cardDesc}>{g.description || 'No description'}</p>
+              {g.createdByName && (
+                <div style={S.creator}>✦ Created by <b>{g.createdByName}</b></div>
+              )}
               <div style={S.cardFoot}>
                 <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
                   👥 {g.memberCount || 1} member{(g.memberCount || 1) !== 1 ? 's' : ''}
@@ -159,6 +162,7 @@ const S = {
   cardName:  { fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, color: 'var(--text-primary)', marginBottom: 6 },
   cardDesc:  { fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.5 },
   cardFoot:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  creator:   { fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 },
   code:      { fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', background: 'var(--bg-secondary)', padding: '3px 8px', borderRadius: 6 },
   empty:     { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '80px 0', textAlign: 'center' },
   emptyTitle:{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--text-primary)', marginBottom: 8 },

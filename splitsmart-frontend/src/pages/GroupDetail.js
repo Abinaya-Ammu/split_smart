@@ -172,6 +172,11 @@ export default function GroupDetail() {
           <div style={S.groupType}>{group.type}</div>
           <h1 style={S.title}>{group.name}</h1>
           <p style={S.subtitle}>{group.description||''} · Code: <b style={{color:'var(--accent-bright)',fontFamily:'monospace'}}>#{group.inviteCode}</b></p>
+          {group.createdByName && (
+            <p style={{fontSize:13, color:'var(--text-muted)', marginTop:4}}>
+              ✦ Created by <b style={{color:'var(--text-secondary)'}}>{group.createdByName}</b>
+            </p>
+          )}
         </div>
         <div style={S.headRight}>
           <div style={S.pill}>
